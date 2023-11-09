@@ -1,4 +1,4 @@
 class Posting:
-    def __init__(self, id, freq):
+    def __init__(self, id, tfidf):
         self.id = id
-        self.freq = freq
+        self.tfidf = tfidf
