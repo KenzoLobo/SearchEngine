@@ -2,25 +2,24 @@ import json
 import nltk
 from bs4 import BeautifulSoup
 from nltk.tokenize import word_tokenize
+from posting import Posting
 
 # downloads tokenizing libaries
 nltk.download("punkt")
 
-# imports the Posting class to use as our value for our dictionary
-from posting import Posting
-
 # creates a set of unique tokens - set access is O(1), so we can easily hold a set of unique tokens in here
 tokens = set() # do we even need this idk i thought we did but idk now
-
-# creates a dictionary of urls - key: url, token: id
-urlIDs = dict()
 
 # creates a dictionary to store our index
 # KEY: token, VALUE: Posting (object)
 index = dict()
 
+# creates a dictionary to store unique URL ids
+# KEY: url, VALUE: id
+url_ids = dict()
+
 # initial id for our url dictionary
-id = 1
+current_id = 1
 
 # currently testing one file locally
 filename = "C:/Users/aditm/OneDrive/Desktop/UCI/UCI Fall 2023/CS121/Assignment 3/M1/CS121---A3-M1/0a0095d4c7566f38a53f76c4f90ce6ca4c6aa7103c9c17c88ed66802e0f55926.json"
@@ -74,6 +73,9 @@ def tokenize(soup):
     return all_tokens
 
 def parse_json(filename):
+    # tracks the current id of the posting
+    global current_id
+
     # Open the JSON file for reading
     with open(filename, "r") as json_file:
         
@@ -86,9 +88,34 @@ def parse_json(filename):
     encoding = parsed_data["encoding"]
 
     # adds current URL we are parsing and its id (first iteration being one, each subsequent iteration ++) to the dictionary of urls
-    # Need to enclose this in a loop where every iteration id increments
-    urlIDs[url] = id
-    id = id + 1
+    if url not in url_ids:
+        url_ids[url] = current_id
+        current_id += 1
+    
+    # creates a dictionary for counting tokens in the current url
+    frequency = dict()
+
+    # here, we need a set of tokens that belong to this url
+    soup = BeautifulSoup(html, 'html.parser')
+    tokens = tokenize(soup)
+
+    # for every token, we first must add it to our index
+    # then, increment the frequency of the token on each occurence of a token
+    for token in tokens:
+        if token not in index:
+            index[token] = []
+        if token not in frequency:
+            frequency[token] = 1
+        else:
+            frequency[token] += 1
+
+        # create a new Posting for this url
+        posting = Posting(url, current_id, frequency[token])
+
+        # add our token and posting to our index
+        index[token].append(posting)
+
+        
 
     print("---------- URL PARSED: ", url, " ----------")
 
@@ -96,7 +123,14 @@ def parse_json(filename):
 
 # parses the HTML using BeautifulSoup and tokenizes the html content
 content = parse_json(filename)
-soup = BeautifulSoup(content, 'html.parser')
-tokens = tokenize(soup)
+
+# prints index
+for token, postings in index.items():
+    print(f"{token}:")
+    for posting in postings:
+        print(f"  Posting ID: {posting.get_id()}, URL: {posting.get_url()}, Frequency: {posting.get_tfidf()}")
+
+    print("\n")
+
 
 print("\n------------------------------\n")
