@@ -1,12 +1,15 @@
 import json
 import nltk
-import os
+
 import sys
+from os.path import getsize
 from collections import defaultdict
+
 from bs4 import BeautifulSoup
 from nltk.tokenize import word_tokenize
 from posting import Posting
 from collections import defaultdict
+from pathlib import Path
 
 # downloads tokenizing libraries
 nltk.download("punkt")
@@ -16,7 +19,7 @@ tokens = set() # do we even need this idk i thought we did but idk now
 
 # creates a dictionary to store our index
 # KEY: token, VALUE: Posting (object)
-index = defaultdict(list)
+index = dict()
 
 # creates a dictionary to store unique URL ids
 # KEY: url, VALUE: id
@@ -27,6 +30,19 @@ current_id = 0
 
 # currently testing one file locally
 filename = "/home/lobokj/IR23F-A3-G27/0a0095d4c7566f38a53f76c4f90ce6ca4c6aa7103c9c17c88ed66802e0f55926.json"
+
+
+def navigate_through_directories():
+    # assign directory
+    # iterate over files in
+    # that directory
+    dir="/home/lobokj/IR23F-A3-G27/DEV"
+    subdirs = Path(dir).glob('*')
+    for sub in subdirs:
+        # parse_json(file)
+        files = Path(sub).glob('*')
+        for file in files:
+            parse_json(file)
 
 def tokenize(soup):
     '''
@@ -50,7 +66,7 @@ def tokenize(soup):
 
     # Tokenize the headings
     headings = [heading.text for heading in soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])]
-    heading_tokens = [word_tokenize(heading) for heading in headings if token.isalnum()]
+    heading_tokens = [word_tokenize(heading) for heading in headings if heading.isalnum()]
 
     print("Heading_tokens:")
     for heading_token in heading_tokens:
@@ -149,21 +165,33 @@ def parse_json(filename):
 
 if __name__ == "__main__":
     # parses the HTML using BeautifulSoup and tokenizes the html content
-    content = parse_json(filename)
+    # content = parse_json(filename)
+
+    navigate_through_directories()
 
     # prints index
     for token, postings in index.items():
         print(f"{token}:")
         for posting in postings:
             print(f"  Posting ID: {posting.get_id()}, URL: {posting.get_url()}, Frequency: {posting.get_tfidf()}")
-    # prints index
-    for token, postings in index.items():
-        print(f"{token}:")
-        for posting in postings:
-            print(f"  Posting ID: {posting.get_id()}, URL: {posting.get_url()}, Frequency: {posting.get_tfidf()}")
-
-        print("\n")
-        print("\n")
-
 
     print("\n------------------------------\n")
+
+
+    #write to file all of index
+    with open('indexreport.txt', 'w') as file:
+        for token, postings in index.items():
+            file.write(f"{token} :")
+            for posting in postings:
+                file.write(f"{posting.get_id()}, {posting.get_url()}, {posting.get_tfidf()}, ")
+                file.write("\n")
+
+    #write to file report
+    with open('report.txt', 'w') as f:
+        f.write(f" Number of indexed documents: {current_id}")
+        f.write('\n')
+        f.write(f" Number of unique words: {len(index.items())}")
+        f.write('\n')
+        f.write(f" Size of dictionary in KB: {sys.getsizeof(index)/1000}")
+        f.write('\n')
+        f.write(f" Size of index file in KB: {getsize('indexreport.txt')/1000}")

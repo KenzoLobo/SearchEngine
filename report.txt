@@ -1,0 +1,4 @@
+ Number of indexed documents: 0
+ Number of unique words: 0
+ Size of dictionary in KB: 0.064
+ Size of index file in KB: 0.0
