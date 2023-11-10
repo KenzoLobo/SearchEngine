@@ -1,11 +1,14 @@
 import json
 import nltk
+import os
+import sys
+from collections import defaultdict
 from bs4 import BeautifulSoup
 from nltk.tokenize import word_tokenize
 from posting import Posting
 from collections import defaultdict
 
-# downloads tokenizing libaries
+# downloads tokenizing libraries
 nltk.download("punkt")
 
 # creates a set of unique tokens - set access is O(1), so we can easily hold a set of unique tokens in here
@@ -13,7 +16,7 @@ tokens = set() # do we even need this idk i thought we did but idk now
 
 # creates a dictionary to store our index
 # KEY: token, VALUE: Posting (object)
-index = dict()
+index = defaultdict(list)
 
 # creates a dictionary to store unique URL ids
 # KEY: url, VALUE: id
@@ -26,6 +29,10 @@ current_id = 0
 filename = "/home/lobokj/IR23F-A3-G27/0a0095d4c7566f38a53f76c4f90ce6ca4c6aa7103c9c17c88ed66802e0f55926.json"
 
 def tokenize(soup):
+    '''
+    Tokenize titles, headings, and body content of parsed HTML content in JSON. AS OF RIGHT NOW, returns a list of JUST
+    the body content of the HTML.
+    '''
     # Here, tokenize the title and headings separately to give them more weight later
 
     # Tokenize the title
@@ -85,6 +92,13 @@ def tokenize(soup):
     return all_tokens
 
 def parse_json(filename):
+    '''
+    Loads JSON file into parsed_data dictionary, updates frequency dictionary, tokenizes HTML content in JSON file,
+    updates the index, and returns the HTML content of the JSON
+
+    :param filename:
+    :return html:
+    '''
     # tracks the current id of the posting
     global current_id
 
@@ -142,7 +156,13 @@ if __name__ == "__main__":
         print(f"{token}:")
         for posting in postings:
             print(f"  Posting ID: {posting.get_id()}, URL: {posting.get_url()}, Frequency: {posting.get_tfidf()}")
+    # prints index
+    for token, postings in index.items():
+        print(f"{token}:")
+        for posting in postings:
+            print(f"  Posting ID: {posting.get_id()}, URL: {posting.get_url()}, Frequency: {posting.get_tfidf()}")
 
+        print("\n")
         print("\n")
 
 
