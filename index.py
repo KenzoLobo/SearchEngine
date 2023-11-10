@@ -1,6 +1,7 @@
 import json
 import nltk
 import sys
+from os.path import getsize
 from bs4 import BeautifulSoup
 from nltk.tokenize import word_tokenize
 from posting import Posting
@@ -136,12 +137,6 @@ for token, postings in index.items():
 
 print("\n------------------------------\n")
 
-#write to file report
-with open('report.txt', 'w') as f:
-    f.write(f" Number of indexed documents: {current_id}")
-    f.write('\n')
-    f.write(f" Number of unique words: {len(index.items())}")
-    f.write('\n')
 
 #write to file all of index
 with open('indexreport.txt', 'w') as file:
@@ -150,4 +145,12 @@ with open('indexreport.txt', 'w') as file:
         for posting in postings:
             file.write(f"{posting.get_id()}{posting.get_url()}{posting.get_tfidf()}")
 
-print(sys.getsizeof(index)/1000)
+#write to file report
+with open('report.txt', 'w') as f:
+    f.write(f" Number of indexed documents: {current_id}")
+    f.write('\n')
+    f.write(f" Number of unique words: {len(index.items())}")
+    f.write('\n')
+    f.write(f" Size of dictionary in KB: {sys.getsizeof(index)/1000}")
+    f.write('\n')
+    f.write(f" Size of index file in KB: {getsize('indexreport.txt')/1000}")
