@@ -1,5 +1,7 @@
 import json
 import nltk
+import os
+import sys
 from collections import defaultdict
 from bs4 import BeautifulSoup
 from nltk.tokenize import word_tokenize
@@ -23,7 +25,7 @@ url_ids = dict()
 current_id = 1
 
 # currently testing one file locally
-filename = "C:/Users/aditm/OneDrive/Desktop/UCI/UCI Fall 2023/CS121/Assignment 3/M1/CS121---A3-M1/0a0095d4c7566f38a53f76c4f90ce6ca4c6aa7103c9c17c88ed66802e0f55926.json"
+filename = "/home/ajverma/.virtualenvs/IR23F-A3-G27/0a0095d4c7566f38a53f76c4f90ce6ca4c6aa7103c9c17c88ed66802e0f55926.json"
 
 def tokenize(soup):
     '''
@@ -134,16 +136,28 @@ def parse_json(filename):
 
     return html
 
-# parses the HTML using BeautifulSoup and tokenizes the html content
-content = parse_json(filename)
+def directory_navigator(DEV_directory):
+    '''
+    Takes DEV_directory as input and indexes every JSON file in DEV.
+    '''
+    for directory in os.listdir(DEV_directory):
+        for file in os.path.join(DEV_directory, directory):
+            parse_json(file)
 
-# prints index
-for token, postings in index.items():
-    print(f"{token}:")
-    for posting in postings:
-        print(f"  Posting ID: {posting.get_id()}, URL: {posting.get_url()}, Frequency: {posting.get_tfidf()}")
+if '__name__' == '__main__':
+    # parses the HTML using BeautifulSoup and tokenizes the html content
+    # content = parse_json(filename)
 
-    print("\n")
+    DEV_directory = sys.argv[1]
+    directory_navigator(DEV_directory)
+
+    # prints index
+    for token, postings in index.items():
+        print(f"{token}:")
+        for posting in postings:
+            print(f"  Posting ID: {posting.get_id()}, URL: {posting.get_url()}, Frequency: {posting.get_tfidf()}")
+
+        print("\n")
 
 
 print("\n------------------------------\n")
