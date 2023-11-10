@@ -130,9 +130,9 @@ content = parse_json(filename)
 #write to file all of index
 with open('indexreport.txt', 'w') as file:
     for token, postings in index.items():
-        file.write(f"{token}, ")
+        file.write(f"{token}: ")
         for posting in postings:
-            file.write(f"{posting.get_id()}, {posting.get_url()}, {posting.get_tfidf()}, ")
+            file.write(f"{posting.get_id()}, {posting.get_url()}, {posting.get_tfidf()} ")
 
 
 #write to file report
