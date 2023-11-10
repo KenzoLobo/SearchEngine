@@ -1,0 +1,2 @@
+ Number of indexed documents: 1
+ Number of unique words: 410
