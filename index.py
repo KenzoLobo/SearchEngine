@@ -1,12 +1,15 @@
 import json
 import nltk
+
 import sys
 from os.path import getsize
+from collections import defaultdict
+
 from bs4 import BeautifulSoup
 from nltk.tokenize import word_tokenize
 from posting import Posting
 
-# downloads tokenizing libaries
+# downloads tokenizing libraries
 nltk.download("punkt")
 
 # creates a set of unique tokens - set access is O(1), so we can easily hold a set of unique tokens in here
@@ -14,7 +17,7 @@ tokens = set() # do we even need this idk i thought we did but idk now
 
 # creates a dictionary to store our index
 # KEY: token, VALUE: Posting (object)
-index = dict()
+index = defaultdict(list)
 
 # creates a dictionary to store unique URL ids
 # KEY: url, VALUE: id
@@ -27,6 +30,10 @@ current_id = 0
 filename = "/home/joanau/IR23F-A3-G27/0a0095d4c7566f38a53f76c4f90ce6ca4c6aa7103c9c17c88ed66802e0f55926.json"
 
 def tokenize(soup):
+    '''
+    Tokenize titles, headings, and body content of parsed HTML content in JSON. AS OF RIGHT NOW, returns a list of JUST
+    the body content of the HTML.
+    '''
     # Here, tokenize the title and headings separately to give them more weight later
 
     # Tokenize the title
@@ -44,7 +51,7 @@ def tokenize(soup):
 
     # Tokenize the headings
     headings = [heading.text for heading in soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])]
-    heading_tokens = [word_tokenize(heading) for heading in headings if token.isalnum()]
+    heading_tokens = [word_tokenize(heading) for heading in headings if heading.isalnum()] # changed token.isalnum() to heading.isalnum() - arkin
 
     # Filter out non-alphanumeric tokens in headings
     filtered_heading_tokens = []
@@ -75,6 +82,13 @@ def tokenize(soup):
     return all_tokens
 
 def parse_json(filename):
+    '''
+    Loads JSON file into parsed_data dictionary, updates frequency dictionary, tokenizes HTML content in JSON file,
+    updates the index, and returns the HTML content of the JSON
+
+    :param filename:
+    :return html:
+    '''
     # tracks the current id of the posting
     global current_id
 
@@ -104,8 +118,9 @@ def parse_json(filename):
     # for every token, we first must add it to our index
     # then, increment the frequency of the token on each occurence of a token
     for token in tokens:
-        if token not in index:
-            index[token] = []
+        # TODO: Adit can I delete this? changed index to defaultdict
+        # if token not in index:
+        #     index[token] = []
         if token not in frequency:
             frequency[token] = 1
         else:
