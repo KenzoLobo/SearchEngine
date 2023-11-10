@@ -126,24 +126,14 @@ def parse_json(filename):
 # parses the HTML using BeautifulSoup and tokenizes the html content
 content = parse_json(filename)
 
-# prints index
-for token, postings in index.items():
-    print(f"{token}:")
-    for posting in postings:
-        print(f"  Posting ID: {posting.get_id()}, URL: {posting.get_url()}, Frequency: {posting.get_tfidf()}")
-
-    print("\n")
-
-
-print("\n------------------------------\n")
-
 
 #write to file all of index
 with open('indexreport.txt', 'w') as file:
     for token, postings in index.items():
-        file.write(f"{token}")
+        file.write(f"{token}, ")
         for posting in postings:
-            file.write(f"{posting.get_id()}{posting.get_url()}{posting.get_tfidf()}")
+            file.write(f"{posting.get_id()}, {posting.get_url()}, {posting.get_tfidf()}, ")
+
 
 #write to file report
 with open('report.txt', 'w') as f:
@@ -154,3 +144,14 @@ with open('report.txt', 'w') as f:
     f.write(f" Size of dictionary in KB: {sys.getsizeof(index)/1000}")
     f.write('\n')
     f.write(f" Size of index file in KB: {getsize('indexreport.txt')/1000}")
+
+# prints index
+for token, postings in index.items():
+    print(f"{token}:")
+    for posting in postings:
+        print(f"  Posting ID: {posting.get_id()}, URL: {posting.get_url()}, Frequency: {posting.get_tfidf()}")
+
+    print("\n")
+
+
+print("\n------------------------------\n")
