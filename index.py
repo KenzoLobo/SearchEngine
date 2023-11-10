@@ -146,8 +146,8 @@ with open('report.txt', 'w') as f:
 #write to file all of index
 with open('indexreport.txt', 'w') as file:
     for token, postings in index.items():
-        file.write(f"{token}:")
+        file.write(f"{token}")
         for posting in postings:
-            file.write(f"Posting ID: {posting.get_id()}, URL: {posting.get_url()}, Frequency: {posting.get_tfidf()}")
+            file.write(f"{posting.get_id()}{posting.get_url()}{posting.get_tfidf()}")
 
-print(sys.getsizeof(index))
+print(sys.getsizeof(index)/1000)
