@@ -20,7 +20,7 @@ index = dict()
 url_ids = dict()
 
 # initial id for our url dictionary
-current_id = 1
+current_id = 0
 
 # currently testing one file locally
 filename = "/home/lobokj/IR23F-A3-G27/0a0095d4c7566f38a53f76c4f90ce6ca4c6aa7103c9c17c88ed66802e0f55926.json"
@@ -67,7 +67,7 @@ def tokenize(soup):
     # Filter out non-alphanumeric tokens in body content
     filtered_body_tokens = []
     for tokens in body_tokens:
-        filtered_tokens = [token.lower() for token in tokens if token.isalnum()]
+        filtered_tokens = [token.lower().lower() for token in tokens if token.isalnum()]
         filtered_body_tokens.append(filtered_tokens)
                 
     print("Filtered Body Tokens:")
@@ -99,9 +99,9 @@ def parse_json(filename):
     encoding = parsed_data["encoding"]
 
     # adds current URL we are parsing and its id (first iteration being one, each subsequent iteration ++) to the dictionary of urls
+    current_id += 1
     if url not in url_ids:
         url_ids[url] = current_id
-        current_id += 1
     else: 
         return #if we have already seen the url we don't need to parse through the html
     
@@ -122,9 +122,9 @@ def parse_json(filename):
         else:
             frequency[token] += 1
 
-    for unique_token in frequency.keys():
+    for token, freq in frequency.items():
         # create a new Posting for this url
-        posting = Posting(url, current_id, frequency[unique_token])
+        posting = Posting(url, current_id, freq)
         # add our token and posting to our index
         index[token].append(posting)
 
