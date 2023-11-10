@@ -1,6 +1,10 @@
 import json
 import nltk
+
+import sys
+from os.path import getsize
 from collections import defaultdict
+
 from bs4 import BeautifulSoup
 from nltk.tokenize import word_tokenize
 from posting import Posting
@@ -20,10 +24,10 @@ index = defaultdict(list)
 url_ids = dict()
 
 # initial id for our url dictionary
-current_id = 1
+current_id = 0
 
 # currently testing one file locally
-filename = "C:/Users/aditm/OneDrive/Desktop/UCI/UCI Fall 2023/CS121/Assignment 3/M1/CS121---A3-M1/0a0095d4c7566f38a53f76c4f90ce6ca4c6aa7103c9c17c88ed66802e0f55926.json"
+filename = "/home/joanau/IR23F-A3-G27/0a0095d4c7566f38a53f76c4f90ce6ca4c6aa7103c9c17c88ed66802e0f55926.json"
 
 def tokenize(soup):
     '''
@@ -64,7 +68,7 @@ def tokenize(soup):
     # Filter out non-alphanumeric tokens in body content
     filtered_body_tokens = []
     for tokens in body_tokens:
-        filtered_tokens = [token for token in tokens if token.isalnum()]
+        filtered_tokens = [token.lower() for token in tokens if token.isalnum()]
         filtered_body_tokens.append(filtered_tokens)
 
     # print(filtered_body_tokens)
@@ -100,9 +104,9 @@ def parse_json(filename):
     encoding = parsed_data["encoding"]
 
     # adds current URL we are parsing and its id (first iteration being one, each subsequent iteration ++) to the dictionary of urls
+    current_id += 1
     if url not in url_ids:
         url_ids[url] = current_id
-        current_id += 1
     
     # creates a dictionary for counting tokens in the current url
     frequency = dict()
@@ -122,9 +126,9 @@ def parse_json(filename):
         else:
             frequency[token] += 1
 
+    for token, freq in frequency.items():
         # create a new Posting for this url
-        posting = Posting(url, current_id, frequency[token])
-
+        posting = Posting(url, current_id, freq)
         # add our token and posting to our index
         index[token].append(posting)
 
@@ -147,3 +151,21 @@ for token, postings in index.items():
 
 
 print("\n------------------------------\n")
+
+
+#write to file all of index
+with open('indexreport.txt', 'w') as file:
+    for token, postings in index.items():
+        file.write(f"{token}")
+        for posting in postings:
+            file.write(f"{posting.get_id()}{posting.get_url()}{posting.get_tfidf()}")
+
+#write to file report
+with open('report.txt', 'w') as f:
+    f.write(f" Number of indexed documents: {current_id}")
+    f.write('\n')
+    f.write(f" Number of unique words: {len(index.items())}")
+    f.write('\n')
+    f.write(f" Size of dictionary in KB: {sys.getsizeof(index)/1000}")
+    f.write('\n')
+    f.write(f" Size of index file in KB: {getsize('indexreport.txt')/1000}")
