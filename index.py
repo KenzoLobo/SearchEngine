@@ -3,6 +3,7 @@ import nltk
 from bs4 import BeautifulSoup
 from nltk.tokenize import word_tokenize
 from posting import Posting
+from collections import defaultdict
 
 # downloads tokenizing libaries
 nltk.download("punkt")
@@ -22,7 +23,7 @@ url_ids = dict()
 current_id = 1
 
 # currently testing one file locally
-filename = "C:/Users/aditm/OneDrive/Desktop/UCI/UCI Fall 2023/CS121/Assignment 3/M1/CS121---A3-M1/0a0095d4c7566f38a53f76c4f90ce6ca4c6aa7103c9c17c88ed66802e0f55926.json"
+filename = "/home/lobokj/IR23F-A3-G27/0a0095d4c7566f38a53f76c4f90ce6ca4c6aa7103c9c17c88ed66802e0f55926.json"
 
 def tokenize(soup):
     # Here, tokenize the title and headings separately to give them more weight later
@@ -38,11 +39,15 @@ def tokenize(soup):
     for token in title_tokens:
         if token.isalnum():
             filtered_title_tokens.append(token)
-    # print(filtered_title_tokens)
+    print("Filtered title tokens", filtered_title_tokens)
 
     # Tokenize the headings
     headings = [heading.text for heading in soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])]
     heading_tokens = [word_tokenize(heading) for heading in headings if token.isalnum()]
+
+    print("Heading_tokens:")
+    for heading_token in heading_tokens:
+        print (heading_token)
 
     # Filter out non-alphanumeric tokens in headings
     filtered_heading_tokens = []
@@ -51,6 +56,9 @@ def tokenize(soup):
         filtered_heading_tokens.append(filtered_tokens)
 
     # print(filtered_heading_tokens)
+    print("Filtered Heading Tokens:")
+    for heading_token in heading_tokens:
+        print(heading_token)
 
     # Tokenize the body content
     body = [paragraph.text for paragraph in soup.find_all("p")]
@@ -59,15 +67,19 @@ def tokenize(soup):
     # Filter out non-alphanumeric tokens in body content
     filtered_body_tokens = []
     for tokens in body_tokens:
-        filtered_tokens = [token for token in tokens if token.isalnum()]
+        filtered_tokens = [token.lower() for token in tokens if token.isalnum()]
         filtered_body_tokens.append(filtered_tokens)
-
-    # print(filtered_body_tokens)
+                
+    print("Filtered Body Tokens:")
+    for filtered_body_token in filtered_body_tokens:
+        print(filtered_body_token)
 
     # transforms all the tokens from the sublist structure to a single array
     all_tokens = []
     for sublist in filtered_body_tokens:
         all_tokens.extend(sublist)
+
+    print("All Body Tokens:")
     print(all_tokens)
 
     return all_tokens
@@ -78,7 +90,6 @@ def parse_json(filename):
 
     # Open the JSON file for reading
     with open(filename, "r") as json_file:
-        
         # Parses JSON from the file into a Python dictionary
         parsed_data = json.load(json_file)
 
@@ -91,6 +102,8 @@ def parse_json(filename):
     if url not in url_ids:
         url_ids[url] = current_id
         current_id += 1
+    else: 
+        return #if we have already seen the url we don't need to parse through the html
     
     # creates a dictionary for counting tokens in the current url
     frequency = dict()
@@ -104,33 +117,33 @@ def parse_json(filename):
     for token in tokens:
         if token not in index:
             index[token] = []
-        if token not in frequency:
+        if token not in frequency: 
             frequency[token] = 1
         else:
             frequency[token] += 1
 
+    for unique_token in frequency.keys():
         # create a new Posting for this url
-        posting = Posting(url, current_id, frequency[token])
-
+        posting = Posting(url, current_id, frequency[unique_token])
         # add our token and posting to our index
         index[token].append(posting)
-
-        
 
     print("---------- URL PARSED: ", url, " ----------")
 
     return html
 
-# parses the HTML using BeautifulSoup and tokenizes the html content
-content = parse_json(filename)
 
-# prints index
-for token, postings in index.items():
-    print(f"{token}:")
-    for posting in postings:
-        print(f"  Posting ID: {posting.get_id()}, URL: {posting.get_url()}, Frequency: {posting.get_tfidf()}")
+if __name__ == "__main__":
+    # parses the HTML using BeautifulSoup and tokenizes the html content
+    content = parse_json(filename)
 
-    print("\n")
+    # prints index
+    for token, postings in index.items():
+        print(f"{token}:")
+        for posting in postings:
+            print(f"  Posting ID: {posting.get_id()}, URL: {posting.get_url()}, Frequency: {posting.get_tfidf()}")
+
+        print("\n")
 
 
-print("\n------------------------------\n")
+    print("\n------------------------------\n")
