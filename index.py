@@ -176,12 +176,38 @@ def getPages(query_tokens):
         matched_urls=matched_urls.intersection(curr_urls)
 
     return matched_urls
+
+def fill_dict(file_path):
+    postings = {}
+    current_token = None
+
+    with open(file_path, 'r',  encoding='utf-8-sig', errors='ignore') as file:
+        for line in file.readlines():
+            line = line.strip()
+            if line.endswith(':'):
+                current_token = line[:-1].strip()
+                postings[current_token] = []
+            else:
+                data = line.split(', ')
+                id = int(data[0])
+                url = ', '.join(data[1:-1]) 
+                tfidf = int(data[-1].rstrip(','))
+
+                posting = Posting(url, id, tfidf)
+                postings[current_token].append(posting)
+
+    return postings
             
 if __name__ == "__main__":
     # parses the HTML using BeautifulSoup and tokenizes the html content
     # content = parse_json(filename)
 
+    # fille the index by parsing through the DEV folder
     navigate_through_directories()
+
+
+    # uncomment this line to test with a fake index created from fakeindex.txt file
+    # index = fill_dict("./fakeindex.txt")
 
     print (getPages(["machine", "learning"]))
 
@@ -194,7 +220,6 @@ if __name__ == "__main__":
     # print("\n------------------------------\n")
 
     
-
     #write to file all of index
     with open('indexreport.txt', 'w') as file:
         for token, postings in index.items():
