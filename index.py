@@ -18,7 +18,7 @@ nltk.download("punkt")
 tokens = set() # do we even need this idk i thought we did but idk now
 
 # creates a dictionary to store our index
-# KEY: token, VALUE: Posting (object)
+# KEY: token, VALUE: List of Posting (object)
 index = dict()
 
 # creates a dictionary to store unique URL ids
@@ -29,14 +29,14 @@ url_ids = dict()
 current_id = 0
 
 # currently testing one file locally
-filename = "/home/lobokj/IR23F-A3-G27/0a0095d4c7566f38a53f76c4f90ce6ca4c6aa7103c9c17c88ed66802e0f55926.json"
+# filename = "/home/lobokj/IR23F-A3-G27/0a0095d4c7566f38a53f76c4f90ce6ca4c6aa7103c9c17c88ed66802e0f55926.json"
 
 
 def navigate_through_directories():
     # assign directory
     # iterate over files in
     # that directory
-    dir="/home/lobokj/IR23F-A3-G27/DEV"
+    dir="DEV"
     subdirs = Path(dir).glob('*')
     for sub in subdirs:
         # parse_json(file)
@@ -62,15 +62,15 @@ def tokenize(soup):
     for token in title_tokens:
         if token.isalnum():
             filtered_title_tokens.append(token)
-    print("Filtered title tokens", filtered_title_tokens)
+    # print("Filtered title tokens", filtered_title_tokens)
 
     # Tokenize the headings
     headings = [heading.text for heading in soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])]
     heading_tokens = [word_tokenize(heading) for heading in headings if heading.isalnum()]
 
-    print("Heading_tokens:")
-    for heading_token in heading_tokens:
-        print (heading_token)
+    # print("Heading_tokens:")
+    # for heading_token in heading_tokens:
+    #     print (heading_token)
 
     # Filter out non-alphanumeric tokens in headings
     filtered_heading_tokens = []
@@ -79,9 +79,9 @@ def tokenize(soup):
         filtered_heading_tokens.append(filtered_tokens)
 
     # print(filtered_heading_tokens)
-    print("Filtered Heading Tokens:")
-    for heading_token in heading_tokens:
-        print(heading_token)
+    # print("Filtered Heading Tokens:")
+    # for heading_token in heading_tokens:
+    #     print(heading_token)
 
     # Tokenize the body content
     body = [paragraph.text for paragraph in soup.find_all("p")]
@@ -93,17 +93,17 @@ def tokenize(soup):
         filtered_tokens = [token.lower().lower() for token in tokens if token.isalnum()]
         filtered_body_tokens.append(filtered_tokens)
                 
-    print("Filtered Body Tokens:")
-    for filtered_body_token in filtered_body_tokens:
-        print(filtered_body_token)
+    # print("Filtered Body Tokens:")
+    # for filtered_body_token in filtered_body_tokens:
+    #     print(filtered_body_token)
 
     # transforms all the tokens from the sublist structure to a single array
     all_tokens = []
     for sublist in filtered_body_tokens:
         all_tokens.extend(sublist)
 
-    print("All Body Tokens:")
-    print(all_tokens)
+    # print("All Body Tokens:")
+    # print(all_tokens)
 
     return all_tokens
 
@@ -162,26 +162,43 @@ def parse_json(filename):
 
     return html
 
+# query_tokens -> list of query tokens inputed by the user
+def getPages(query_tokens):
+    
+    matched_urls=set()
+    for posting in index[query_tokens[0]]:
+        matched_urls.add(posting.get_url())
+       
+    for query_token in query_tokens:
+        curr_urls=set()
+        for posting in index[query_token]:
+            curr_urls.add(posting.get_url())
+        matched_urls=matched_urls.intersection(curr_urls)
 
+    return matched_urls
+            
 if __name__ == "__main__":
     # parses the HTML using BeautifulSoup and tokenizes the html content
     # content = parse_json(filename)
 
     navigate_through_directories()
 
-    # prints index
-    for token, postings in index.items():
-        print(f"{token}:")
-        for posting in postings:
-            print(f"  Posting ID: {posting.get_id()}, URL: {posting.get_url()}, Frequency: {posting.get_tfidf()}")
+    print (getPages(["machine", "learning"]))
 
-    print("\n------------------------------\n")
+    # # prints index
+    # for token, postings in index.items():
+    #     print(f"{token}:")
+    #     for posting in postings:
+    #         print(f"  Posting ID: {posting.get_id()}, URL: {posting.get_url()}, Frequency: {posting.get_tfidf()}")
 
+    # print("\n------------------------------\n")
+
+    
 
     #write to file all of index
     with open('indexreport.txt', 'w') as file:
         for token, postings in index.items():
-            file.write(f"{token} :")
+            file.write(f"{token} :\n")
             for posting in postings:
                 file.write(f"{posting.get_id()}, {posting.get_url()}, {posting.get_tfidf()}, ")
                 file.write("\n")
