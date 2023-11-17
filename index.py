@@ -22,7 +22,7 @@ tokens = set() # do we even need this idk i thought we did but idk now
 index = dict()
 
 # creates a dictionary to store unique URL ids
-# KEY: url, VALUE: id
+# KEY: id, VALUE: url
 url_ids = dict()
 
 # initial id for our url dictionary
@@ -196,41 +196,40 @@ def fill_dict(file_path):
     return postings
             
 if __name__ == "__main__":
-<<<<<<< HEAD
 
-    user_input = input("Enter a string: ")
-    query_list =word_tokenize(user_input)
-=======
     user_input = input("Welcome. Please enter a string: ")
     query_list = word_tokenize(user_input)
-    if len(query_list) == 0:
+
+    navigate_through_directories()
+    res =getPages(query_list)
+
+    if len(res) == 0:
         print("Unfortunately there are no available results to your query. :( ")
-    elif len(query_list) < 5:
+    elif len(res) < 5:
         print("These are the available results: ")
-        for ele in query_list:
+        for ele in res:
             print(ele)
-    elif len(query_list) >= 5:
+    elif len(res) >= 5:
         print("These are the top 5 links: ")
         for i in range(5):
-            print(f"{i+1}. {query_list[i]}")
+            print(f"{i+1}. {res[i]}")
     else:
         print("Error with query.")
 
->>>>>>> origin/joana
 
     # parses the HTML using BeautifulSoup and tokenizes the html content
     # content = parse_json(filename)
 
     # fille global variables ( index, url_ids ) by parsing through the DEV folder
-    navigate_through_directories()
+    #navigate_through_directories()
 
 
     # uncomment this line to test with a fake index created from fakeindex.txt file
     # index = fill_dict("./fakeindex.txt")
     
-    id_list=getPages(query_list)
-    for id in id_list:
-        print(url_ids[id])
+    #id_list=getPages(query_list)
+    #for id in id_list:
+    #   print(url_ids[id])
 
     # # prints index
     # for token, postings in index.items():
