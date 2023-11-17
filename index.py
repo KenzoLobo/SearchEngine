@@ -196,23 +196,20 @@ def fill_dict(file_path):
     return postings
             
 if __name__ == "__main__":
-
     user_input = input("Welcome. Please enter a string: ")
     query_list = word_tokenize(user_input)
-
     navigate_through_directories()
-    res =getPages(query_list)
-
+    res = getPages(query_list)
     if len(res) == 0:
         print("Unfortunately there are no available results to your query. :( ")
     elif len(res) < 5:
         print("These are the available results: ")
         for ele in res:
-            print(ele)
+            print(url_ids[ele])
     elif len(res) >= 5:
         print("These are the top 5 links: ")
         for i in range(5):
-            print(f"{i+1}. {res[i]}")
+            print(f"{i+1}. {url_ids[res[i]]}")
     else:
         print("Error with query.")
 
