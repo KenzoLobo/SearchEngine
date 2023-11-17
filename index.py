@@ -199,8 +199,21 @@ def fill_dict(file_path):
     return postings
             
 if __name__ == "__main__":
-    user_input = input("Enter a string: ")
-    query_list =word_tokenize(user_input)
+    user_input = input("Welcome. Please enter a string: ")
+    query_list = word_tokenize(user_input)
+    if len(query_list) == 0:
+        print("Unfortunately there are no available results to your query. :( ")
+    elif len(query_list) < 5:
+        print("These are the available results: ")
+        for ele in query_list:
+            print(ele)
+    elif len(query_list) >= 5:
+        print("These are the top 5 links: ")
+        for i in range(5):
+            print(f"{i+1}. {query_list[i]}")
+    else:
+        print("Error with query.")
+
 
     # parses the HTML using BeautifulSoup and tokenizes the html content
     # content = parse_json(filename)
