@@ -199,17 +199,20 @@ def fill_dict(file_path):
     return postings
             
 if __name__ == "__main__":
+    user_input = input("Enter a string: ")
+    query_list =word_tokenize(user_input)
+
     # parses the HTML using BeautifulSoup and tokenizes the html content
     # content = parse_json(filename)
 
     # fille the index by parsing through the DEV folder
-    navigate_through_directories()
+    # navigate_through_directories()
 
 
     # uncomment this line to test with a fake index created from fakeindex.txt file
-    # index = fill_dict("./fakeindex.txt")
+    index = fill_dict("./fakeindex.txt")
 
-    print (getPages(["machine", "learning"]))
+    print (getPages(query_list))
 
     # # prints index
     # for token, postings in index.items():
@@ -221,19 +224,19 @@ if __name__ == "__main__":
 
     
     #write to file all of index
-    with open('indexreport.txt', 'w') as file:
-        for token, postings in index.items():
-            file.write(f"{token} :\n")
-            for posting in postings:
-                file.write(f"{posting.get_id()}, {posting.get_url()}, {posting.get_tfidf()}, ")
-                file.write("\n")
+    # with open('indexreport.txt', 'w') as file:
+    #     for token, postings in index.items():
+    #         file.write(f"{token} :\n")
+    #         for posting in postings:
+    #             file.write(f"{posting.get_id()}, {posting.get_url()}, {posting.get_tfidf()}, ")
+    #             file.write("\n")
 
-    #write to file report
-    with open('report.txt', 'w') as f:
-        f.write(f" Number of indexed documents: {current_id}")
-        f.write('\n')
-        f.write(f" Number of unique words: {len(index.items())}")
-        f.write('\n')
-        f.write(f" Size of dictionary in KB: {sys.getsizeof(index)/1000}")
-        f.write('\n')
-        f.write(f" Size of index file in KB: {getsize('indexreport.txt')/1000}")
+    # #write to file report
+    # with open('report.txt', 'w') as f:
+    #     f.write(f" Number of indexed documents: {current_id}")
+    #     f.write('\n')
+    #     f.write(f" Number of unique words: {len(index.items())}")
+    #     f.write('\n')
+    #     f.write(f" Size of dictionary in KB: {sys.getsizeof(index)/1000}")
+    #     f.write('\n')
+    #     f.write(f" Size of index file in KB: {getsize('indexreport.txt')/1000}")
