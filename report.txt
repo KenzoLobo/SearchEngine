@@ -1,4 +1,7 @@
+<<<<<<< HEAD
  Number of indexed documents: 1
  Number of unique words: 410
  Size of dictionary in KB: 18.52
  Size of index file in KB: 34.197
+=======
+>>>>>>> Kenzo
