@@ -201,16 +201,18 @@ def fill_dict(file_path):
 if __name__ == "__main__":
     user_input = input("Welcome. Please enter a string: ")
     query_list = word_tokenize(user_input)
-    if len(query_list) == 0:
+    navigate_through_directories()
+    res = getPages(query_list)
+    if len(res) == 0:
         print("Unfortunately there are no available results to your query. :( ")
-    elif len(query_list) < 5:
+    elif len(res) < 5:
         print("These are the available results: ")
-        for ele in query_list:
+        for ele in res:
             print(ele)
-    elif len(query_list) >= 5:
+    elif len(res) >= 5:
         print("These are the top 5 links: ")
         for i in range(5):
-            print(f"{i+1}. {query_list[i]}")
+            print(f"{i+1}. {res[i]}")
     else:
         print("Error with query.")
 
@@ -225,7 +227,6 @@ if __name__ == "__main__":
     # uncomment this line to test with a fake index created from fakeindex.txt file
     index = fill_dict("./fakeindex.txt")
 
-    print (getPages(query_list))
 
     # # prints index
     # for token, postings in index.items():
