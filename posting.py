@@ -9,6 +9,5 @@ class Posting:
 
     def get_id(self):
         return self.id
-
-    def get_tfidf(self):
-        return self.tfidf
+#   def get_tfidf(self):
+#       return self.tfidf

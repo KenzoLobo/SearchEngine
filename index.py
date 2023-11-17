@@ -8,6 +8,8 @@ from collections import defaultdict
 from bs4 import BeautifulSoup
 from nltk.tokenize import word_tokenize
 from posting import Posting
+from collections import defaultdict
+from pathlib import Path
 
 # downloads tokenizing libraries
 nltk.download("punkt")
@@ -27,7 +29,19 @@ url_ids = dict()
 current_id = 0
 
 # currently testing one file locally
-filename = "/home/joanau/IR23F-A3-G27/0a0095d4c7566f38a53f76c4f90ce6ca4c6aa7103c9c17c88ed66802e0f55926.json"
+#filename = "/home/joanau/IR23F-A3-G27/0a0095d4c7566f38a53f76c4f90ce6ca4c6aa7103c9c17c88ed66802e0f55926.json"
+
+def navigate_through_directories():
+    # assign directory
+    # iterate over files in
+    # that directory
+    dir="DEV"
+    subdirs = Path(dir).glob('*')
+    for sub in subdirs:
+        # parse_json(file)
+        files = Path(sub).glob('*')
+        for file in files:
+            parse_json(file) 
 
 def tokenize(soup):
     '''
@@ -139,34 +153,54 @@ def parse_json(filename):
     return html
 
 # parses the HTML using BeautifulSoup and tokenizes the html content
-content = parse_json(filename)
+#content = parse_json(filename)
+# query_tokens -> list of query tokens inputed by the user
+def getPages(query_tokens):
+
+    matched_urls=set()
+    for posting in index[query_tokens[0]]:
+        matched_urls.add(posting.get_url())
+
+    for query_token in query_tokens:
+        curr_urls=set()
+        for posting in index[query_token]:
+            curr_urls.add(posting.get_url())
+        matched_urls=matched_urls.intersection(curr_urls)
+
+    return matched_urls
+
+if __name__ == "__main__":
+    # parses the HTML using BeautifulSoup and tokenizes the html content
+    # content = parse_json(filename)
+
+    navigate_through_directories()
 
 
-#write to file all of index
-with open('indexreport.txt', 'w') as file:
+    #write to file all of index
+    with open('indexreport.txt', 'w') as file:
+        for token, postings in index.items():
+            file.write(f"{token}: ")
+            for posting in postings:
+                file.write(f"{posting.get_id()}, {posting.get_url()}, {posting.get_tfidf()} ")
+
+
+    #write to file report
+    with open('report.txt', 'w') as f:
+        f.write(f" Number of indexed documents: {current_id}")
+        f.write('\n')
+        f.write(f" Number of unique words: {len(index.items())}")
+        f.write('\n')
+        f.write(f" Size of dictionary in KB: {sys.getsizeof(index)/1000}")
+        f.write('\n')
+        f.write(f" Size of index file in KB: {getsize('indexreport.txt')/1000}")
+
+    # prints index
     for token, postings in index.items():
-        file.write(f"{token}: ")
+        print(f"{token}:")
         for posting in postings:
-            file.write(f"{posting.get_id()}, {posting.get_url()}, {posting.get_tfidf()} ")
+            print(f"  Posting ID: {posting.get_id()}, URL: {posting.get_url()}, Frequency: {posting.get_tfidf()}")
+
+        print("\n")
 
 
-#write to file report
-with open('report.txt', 'w') as f:
-    f.write(f" Number of indexed documents: {current_id}")
-    f.write('\n')
-    f.write(f" Number of unique words: {len(index.items())}")
-    f.write('\n')
-    f.write(f" Size of dictionary in KB: {sys.getsizeof(index)/1000}")
-    f.write('\n')
-    f.write(f" Size of index file in KB: {getsize('indexreport.txt')/1000}")
-
-# prints index
-for token, postings in index.items():
-    print(f"{token}:")
-    for posting in postings:
-        print(f"  Posting ID: {posting.get_id()}, URL: {posting.get_url()}, Frequency: {posting.get_tfidf()}")
-
-    print("\n")
-
-
-print("\n------------------------------\n")
+    print("\n------------------------------\n")
