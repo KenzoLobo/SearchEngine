@@ -130,10 +130,7 @@ def parse_json(filename):
 
     # adds current URL we are parsing and its id (first iteration being one, each subsequent iteration ++) to the dictionary of urls
     current_id += 1
-    if url not in url_ids:
-        url_ids[url] = current_id
-    else: 
-        return #if we have already seen the url we don't need to parse through the html
+    url_ids[current_id]=url
     
     # creates a dictionary for counting tokens in the current url
     frequency = dict()
@@ -165,17 +162,17 @@ def parse_json(filename):
 # query_tokens -> list of query tokens inputed by the user
 def getPages(query_tokens):
     
-    matched_urls=set()
+    matched_doc_ids=set()
     for posting in index[query_tokens[0]]:
-        matched_urls.add(posting.get_url())
+        matched_doc_ids.add(posting.get_id())
        
     for query_token in query_tokens:
-        curr_urls=set()
+        curr_doc_ids=set()
         for posting in index[query_token]:
-            curr_urls.add(posting.get_url())
-        matched_urls=matched_urls.intersection(curr_urls)
+            curr_doc_ids.add(posting.get_id())
+        matched_doc_ids=matched_doc_ids.intersection(curr_doc_ids)
 
-    return matched_urls
+    return matched_doc_ids
 
 def fill_dict(file_path):
     postings = {}
@@ -208,11 +205,11 @@ if __name__ == "__main__":
     elif len(res) < 5:
         print("These are the available results: ")
         for ele in res:
-            print(ele)
+            print(url_ids[ele])
     elif len(res) >= 5:
         print("These are the top 5 links: ")
         for i in range(5):
-            print(f"{i+1}. {res[i]}")
+            print(f"{i+1}. {url_ids[res[i]]}")
     else:
         print("Error with query.")
 
@@ -220,8 +217,8 @@ if __name__ == "__main__":
     # parses the HTML using BeautifulSoup and tokenizes the html content
     # content = parse_json(filename)
 
-    # fille the index by parsing through the DEV folder
-    # navigate_through_directories()
+    # fille global variables ( index, url_ids ) by parsing through the DEV folder
+    #navigate_through_directories()
 
 
     # uncomment this line to test with a fake index created from fakeindex.txt file
