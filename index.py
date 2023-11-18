@@ -172,7 +172,7 @@ def getPages(query_tokens):
             curr_doc_ids.add(posting.get_id())
         matched_doc_ids=matched_doc_ids.intersection(curr_doc_ids)
 
-    return matched_doc_ids
+    return list(matched_doc_ids)
 
 def fill_dict(file_path):
     postings = {}
@@ -198,18 +198,24 @@ def fill_dict(file_path):
 if __name__ == "__main__":
     user_input = input("Welcome. Please enter a string: ")
     query_list = word_tokenize(user_input)
+    for i in range(0, len(query_list)):
+        query_list[i]=query_list[i].lower()
+    
+    
     navigate_through_directories()
     res = getPages(query_list)
+    
     if len(res) == 0:
         print("Unfortunately there are no available results to your query. :( ")
     elif len(res) < 5:
         print("These are the available results: ")
-        for ele in res:
-            print(url_ids[ele])
+        for element in res:
+            print(url_ids[element])
     elif len(res) >= 5:
         print("These are the top 5 links: ")
         for i in range(5):
-            print(f"{i+1}. {url_ids[res[i]]}")
+            if len(res)>i:
+                print(f"{i+1}. {url_ids[res[i]]}")
     else:
         print("Error with query.")
 
@@ -237,20 +243,20 @@ if __name__ == "__main__":
     # print("\n------------------------------\n")
 
     
-    #write to file all of index
-    # with open('indexreport.txt', 'w') as file:
-    #     for token, postings in index.items():
-    #         file.write(f"{token} :\n")
-    #         for posting in postings:
-    #             file.write(f"{posting.get_id()}, {posting.get_url()}, {posting.get_tfidf()}, ")
-    #             file.write("\n")
+    # write to file all of index
+    with open('indexreport.txt', 'w') as file:
+        for token, postings in index.items():
+            file.write(f"{token} :\n")
+            for posting in postings:
+                file.write(f"{posting.get_id()}, {posting.get_url()}, {posting.get_tfidf()}, ")
+                file.write("\n")
 
-    # #write to file report
-    # with open('report.txt', 'w') as f:
-    #     f.write(f" Number of indexed documents: {current_id}")
-    #     f.write('\n')
-    #     f.write(f" Number of unique words: {len(index.items())}")
-    #     f.write('\n')
-    #     f.write(f" Size of dictionary in KB: {sys.getsizeof(index)/1000}")
-    #     f.write('\n')
-    #     f.write(f" Size of index file in KB: {getsize('indexreport.txt')/1000}")
+    #write to file report
+    with open('report.txt', 'w') as f:
+        f.write(f" Number of indexed documents: {current_id}")
+        f.write('\n')
+        f.write(f" Number of unique words: {len(index.items())}")
+        f.write('\n')
+        f.write(f" Size of dictionary in KB: {sys.getsizeof(index)/1000}")
+        f.write('\n')
+        f.write(f" Size of index file in KB: {getsize('indexreport.txt')/1000}")
