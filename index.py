@@ -22,7 +22,7 @@ tokens = set() # do we even need this idk i thought we did but idk now
 index = dict()
 
 # creates a dictionary to store unique URL ids
-# KEY: url, VALUE: id
+# KEY: id, VALUE: url
 url_ids = dict()
 
 # initial id for our url dictionary
@@ -130,10 +130,7 @@ def parse_json(filename):
 
     # adds current URL we are parsing and its id (first iteration being one, each subsequent iteration ++) to the dictionary of urls
     current_id += 1
-    if url not in url_ids:
-        url_ids[url] = current_id
-    else: 
-        return #if we have already seen the url we don't need to parse through the html
+    url_ids[current_id]=url
     
     # creates a dictionary for counting tokens in the current url
     frequency = dict()
@@ -165,17 +162,17 @@ def parse_json(filename):
 # query_tokens -> list of query tokens inputed by the user
 def getPages(query_tokens):
     
-    matched_urls=set()
+    matched_doc_ids=set()
     for posting in index[query_tokens[0]]:
-        matched_urls.add(posting.get_url())
+        matched_doc_ids.add(posting.get_id())
        
     for query_token in query_tokens:
-        curr_urls=set()
+        curr_doc_ids=set()
         for posting in index[query_token]:
-            curr_urls.add(posting.get_url())
-        matched_urls=matched_urls.intersection(curr_urls)
+            curr_doc_ids.add(posting.get_id())
+        matched_doc_ids=matched_doc_ids.intersection(curr_doc_ids)
 
-    return matched_urls
+    return list(matched_doc_ids)
 
 def fill_dict(file_path):
     postings = {}
@@ -199,17 +196,43 @@ def fill_dict(file_path):
     return postings
             
 if __name__ == "__main__":
+    user_input = input("Welcome. Please enter a string: ")
+    query_list = word_tokenize(user_input)
+    for i in range(0, len(query_list)):
+        query_list[i]=query_list[i].lower()
+    
+    
+    navigate_through_directories()
+    res = getPages(query_list)
+    
+    if len(res) == 0:
+        print("Unfortunately there are no available results to your query. :( ")
+    elif len(res) < 5:
+        print("These are the available results: ")
+        for element in res:
+            print(url_ids[element])
+    elif len(res) >= 5:
+        print("These are the top 5 links: ")
+        for i in range(5):
+            if len(res)>i:
+                print(f"{i+1}. {url_ids[res[i]]}")
+    else:
+        print("Error with query.")
+
+
     # parses the HTML using BeautifulSoup and tokenizes the html content
     # content = parse_json(filename)
 
-    # fille the index by parsing through the DEV folder
-    navigate_through_directories()
+    # fille global variables ( index, url_ids ) by parsing through the DEV folder
+    #navigate_through_directories()
 
 
     # uncomment this line to test with a fake index created from fakeindex.txt file
     # index = fill_dict("./fakeindex.txt")
-
-    print (getPages(["machine", "learning"]))
+    
+    #id_list=getPages(query_list)
+    #for id in id_list:
+    #   print(url_ids[id])
 
     # # prints index
     # for token, postings in index.items():
@@ -220,7 +243,7 @@ if __name__ == "__main__":
     # print("\n------------------------------\n")
 
     
-    #write to file all of index
+    # write to file all of index
     with open('indexreport.txt', 'w') as file:
         for token, postings in index.items():
             file.write(f"{token} :\n")
