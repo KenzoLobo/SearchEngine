@@ -1,3 +1,1 @@
-# CS121 - Assignment 3 - Search Engine Design
-**M1**
-
+SEARCH ENGINE DESIGN
